@@ -25,6 +25,8 @@ def interest_to_COMP_logcapital(interest):
         return 0
     return minCOMP + log(interest/scaleFactor,base)
 
+# Note: Merkle distributor expects integer values,
+#       so report COMP in wei (10^-18 of 1 COMP)
 jsonFilename = 'EarlyUserCOMP.json'
 with open(jsonFilename,'w') as jsonFile:
     jsonFile.write('{\n')
@@ -40,13 +42,14 @@ with open(jsonFilename,'w') as jsonFile:
             address  = str(line.split(',')[0])
             interest = float(line.split(',')[1])
             COMP = interest_to_COMP_capital(interest)
+            COMPinWei = int(COMP*1.e18)
             cumulativeCOMP += COMP
             if COMP > 0:
                 if firstCOMP:
                     firstCOMP = False
-                    jsonFile.write('  "' + address + '": ' + str(COMP))
+                    jsonFile.write('  "' + address + '": ' + str(COMPinWei))
                 else:
-                    jsonFile.write(",\n" + '  "' + address + '": ' + str(COMP))
+                    jsonFile.write(",\n" + '  "' + address + '": ' + str(COMPinWei))
             lineCounter += 1
     csvFile.close()
     jsonFile.write('\n}')
